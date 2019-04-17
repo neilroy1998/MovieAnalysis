@@ -1,0 +1,464 @@
+﻿Jupyter Notebook
+Untitled
+Last Checkpoint: 11 minutes ago
+(unsaved changes)
+Current Kernel Logo
+Python 3 
+File
+Edit
+View
+Insert
+Cell
+Kernel
+Widgets
+Help
+
+import cv2
+import numpy as np
+import pandas as pd
+from skimage import io
+import matplotlib.pyplot as plt
+import csv
+from sklearn import tree
+from sklearn.model_selection import train_test_split
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+C:\Users\neilr\AppData\Local\Continuum\anaconda3\envs\py36\lib\site-packages\sklearn\ensemble\weight_boosting.py:29: DeprecationWarning: numpy.core.umath_tests is an internal NumPy module and should not be imported. It will be removed in a future NumPy release.
+  from numpy.core.umath_tests import inner1d
+def hms_to_seconds(t):
+    h, m, s = [int(i) for i in t.split(':')]
+    return 3600*h + 60*m + s
+scale_percent = 40
+width = int(image.shape[1] * scale_percent / 100)
+height = int(image.shape[0] * scale_percent / 100)
+print(width,height)
+512 288
+def func(img,x):
+    pixels = np.float32(img.reshape(-1, 3))
+    n_colors = 10
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, x, .1)
+    flags = cv2.KMEANS_RANDOM_CENTERS
+    _, labels, palette = cv2.kmeans(pixels, n_colors, None, criteria, 10, flags)
+    _, counts = np.unique(labels, return_counts=True)
+    dominant = palette[np.argmax(counts)]
+    return dominant.tolist()
+starttime = hms_to_seconds('0:27:56')*1000
+interval = int((starttime-(hms_to_seconds('0:28:16')*1000))/-1000)
+print(interval)
+vidcap = cv2.VideoCapture('New folder (2)\\kurosawa\Dreams (Yume - 1990)\\sample2.avi')
+success,image = vidcap.read()
+count = 0
+lst = []
+while success:
+    resized = cv2.resize(image, (512,288), interpolation = cv2.INTER_AREA)
+    temp = func(resized,75)
+    temp[0],temp[2]=temp[2],temp[0]
+    lst.append(temp)
+    vidcap.set(cv2.CAP_PROP_POS_MSEC,(starttime+count*1000))
+    #cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
+    success,image = vidcap.read()
+    count+=1
+    print(count)
+    if(count==interval):
+        break
+vidcap.release()
+20
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+with open('dreams.csv', mode='a',newline='') as file:
+    writer = csv.writer(file, delimiter=',')
+    writer.writerow([])
+    for i in lst:
+        writer.writerow(i)
+lst
+[[67.02184295654297, 76.5727767944336, 96.1369857788086],
+ [53.03141403198242, 52.41211700439453, 37.54275894165039],
+ [53.410160064697266, 51.60236358642578, 36.47343826293945],
+ [51.59708023071289, 53.75607681274414, 36.29131317138672],
+ [52.606056213378906, 52.8398323059082, 38.12464141845703],
+ [52.52247619628906, 51.13117599487305, 37.442222595214844],
+ [53.22446060180664, 50.57209396362305, 36.43765640258789],
+ [53.478519439697266, 51.763729095458984, 38.69427490234375],
+ [55.08285903930664, 56.13319396972656, 38.10536575317383],
+ [53.891845703125, 53.43088150024414, 37.218994140625],
+ [53.1118278503418, 52.67431640625, 35.67591094970703],
+ [52.53343200683594, 51.307132720947266, 35.35244369506836],
+ [53.2677116394043, 51.421791076660156, 39.12371826171875],
+ [52.4194450378418, 52.436275482177734, 39.3792610168457],
+ [53.9890251159668, 53.99887466430664, 39.68354797363281],
+ [53.86299133300781, 53.70415115356445, 37.81338882446289],
+ [55.558902740478516, 55.38532257080078, 40.73946762084961],
+ [53.19537353515625, 54.74097442626953, 39.54176712036133],
+ [52.17739486694336, 53.54489517211914, 37.48822784423828],
+ [53.32842254638672, 51.885982513427734, 39.82634735107422]]
+a = np.array([lst],dtype=np.uint8)
+imgplot = plt.imshow(a,aspect=50)
+​
+
+with open('dreams.csv', mode='w',newline='') as file:
+    writer = csv.writer(file, delimiter=',')
+    for i in lst:
+        writer.writerow(i)
+plt.imshow(resized)
+<matplotlib.image.AxesImage at 0x24ea3ef1eb8>
+
+​
+import pysrt
+​
+# Loading the Subtitle
+subs = pysrt.open('New folder (2)\\kurosawa\Dreams (Yume - 1990)\\sample1.srt')
+​
+sub = subs[0]
+​
+# Subtitle text
+text = sub.text
+text_without_tags = sub.text_without_tags
+​
+# Start and End time
+start = sub.start.to_time()
+end = sub.end.to_time()
+​
+# Removing line and saving
+#del subs[index]
+#subs.save('dreams_sample1.srt')
+from textblob import TextBlob
+​
+text = '''
+The titular threat of The Blob has always struck me as the ultimate movie
+monster: an insatiably hungry, amoeba-like mass able to penetrate
+virtually any safeguard, capable of--as a doomed doctor chillingly
+describes it--"assimilating flesh on contact.
+Snide comparisons to gelatin be damned, it's a concept with the most
+devastating of potential consequences, not unlike the grey goo scenario
+proposed by technological theorists fearful of
+artificial intelligence run rampant.
+'''
+​
+blob = TextBlob(text)
+blob.tags           # [('The', 'DT'), ('titular', 'JJ'),
+                    #  ('threat', 'NN'), ('of', 'IN'), ...]
+​
+blob.noun_phrases   # WordList(['titular threat', 'blob',
+                    #            'ultimate movie monster',
+                    #            'amoeba-like mass', ...])
+​
+for sentence in blob.sentences:
+    print(sentence.sentiment.polarity)
+# 0.060
+# -0.341
+​
+blob.translate(to="es")  # 'La amenaza titular de The Blob...'
+​
+# Sentiment Analysis
+blob = TextBlob(text)
+sentiment_polarity = blob.sentiment.polarity # -0.1590909090909091
+sentiment_subjectivity = blob.sentiment.subjectivity # 0.6931818181818182
+279.3333333333333
+from datetime import date, datetime, timedelta, time
+import pysrt
+from textblob import TextBlob
+import matplotlib
+from matplotlib import style
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+%matplotlib inline
+matplotlib.rcParams['figure.figsize'] = (16.0, 9.0)
+style.use('fivethirtyeight')
+# Helper Function to create equally divided time intervals
+# start - Starting Time
+# end - Ending Time
+# delta - Interval Period
+def create_intervals(start, end, delta):
+    curr = start
+    while curr <= end:
+        curr = (datetime.combine(date.today(), curr) + delta).time()
+        yield curr
+​
+# Main Function to Get Sentiment Data
+# file - srt file location
+# delta - time interval in minutes
+def get_sentiment(file, delta=10):
+    # Reading Subtitle
+    subs = pysrt.open(file, encoding='iso-8859-1')
+    n = len(subs)
+    # List to store the time periods
+    intervals = []
+    # Start, End and Delta
+    start = time(0, 0, 0)
+    end = subs[-1].end.to_time()
+    delta = timedelta(seconds=delta)
+    for result in create_intervals(start, end, delta):
+        intervals.append(result)
+    # List to store sentiment polarity
+    sentiments = []
+    
+    index = 0
+    m = len(intervals)
+    # Collect and combine all the text in each time interval
+    for i in range(m):
+        text = ""
+        for j in range(index, n):
+            # Finding all subtitle text in the each time interval
+            if subs[j].end.to_time() < intervals[i]:
+                text += subs[j].text_without_tags + " "
+            else:
+                break
+        # Sentiment Analysis
+        blob = TextBlob(text)
+        pol = blob.sentiment.polarity
+        sentiments.append(pol)
+        index = j
+    # Adding Initial State
+    intervals.insert(0, time(0, 0, 0))
+    sentiments.insert(0, 0.0)
+    return (intervals, sentiments)
+​
+# Utility to find average sentiment
+def average(y):
+    avg = float(sum(y))/len(y)
+    return avg
+New folder (2)\\kurosawa\Dreams (Yume - 1990)\\sample2.srt
+x, y = get_sentiment("Akira Kurosawa's Dreams (Yume - 1990) CD 1.srt")
+fig, ax = plt.subplots()
+plt.plot(x, y)
+plt.title("Dreams", fontsize=32)
+plt.ylim((-1, 1))
+plt.ylabel("Sentiment Polarity")
+plt.xlabel("Running Time")
+plt.text(.5, 1.03, "Average Sentiment - " + str(round(average(y), 4)), color="green")
+ttl = ax.title
+ttl.set_position([.5, 1.05])
+
+x, y = get_sentiment("New folder (2)\\kurosawa\Dreams (Yume - 1990)\\sample1.srt")
+lst = [('0:02:28','0:3:20'),('0:11:43','0:12:21'),('0:14:25','00:15:02'),('00:23:09','00:23:55'),('00:26:00','0:28:00'),('0:45:48','0:46:04'),('01:2:45','1:2:53'),('0:47:58','0:48:25'),('01:4:53','1:5:48')]
+lst = [('0:02:33','0:4:40'),('0:06:12','0:08:42'),('0:9:13','0:9:46'),('0:10:27','0:13:56'),('0:23:45','0:25:19'),('0:27:56','0:29:16')]
+​
+lst1=[]
+for i in lst:
+    lst1.append(hms_to_seconds(i[0]))
+lst2=[]
+for i in lst:
+    lst2.append(hms_to_seconds(i[1]))
+lst1
+[148, 703, 865, 1389, 1560, 2748, 3765, 2878, 3893]
+lst2
+[200, 741, 902, 1435, 1680, 2764, 3773, 2905, 3948]
+temp=[]
+for i in range(len(lst)):
+    for j in range(lst1[i],lst2[i]+1):
+        j=int(j/10)
+        temp.append(y[j])
+    temp.append("")
+with open('dreams.csv', mode='a',newline='') as file:
+    writer = csv.writer(file, delimiter=',')
+    for i in temp:
+        writer.writerow([i])
+df1.isnull().values.any()
+False
+df1 = pd.read_csv('final.csv',header=None)
+independent_values = df1.drop([0,1,2,3],axis=1)
+for i in independent_values[4].unique():
+    independent_values['4'+str(i)] = independent_values[4] == i
+for i in independent_values[5].unique():
+    independent_values['5'+str(i)] = independent_values[5] == i
+for i in independent_values[6].unique():
+    independent_values['6'+str(i)] = independent_values[6] == i
+    
+del independent_values[4]
+del independent_values[5]
+del independent_values[6]
+['4intro', '4freedom', '4religion', '4happy', '4work', '4danger','4hope', '4water', '4explosion', '4despair', '4dawn', '4war', '4fire','4murder', '5akira_kurosawa', '6shinichiro_ikebe', '6Toru_Takemitsu']
+independent_values[['4intro', '4freedom', '4religion', '4happy', '4work', '4danger','4hope', '4water', '4explosion', '4despair', '4dawn', '4war', '4fire','4murder', '5akira_kurosawa', '6shinichiro_ikebe', '6Toru_Takemitsu']]=independent_values[['4intro', '4freedom', '4religion', '4happy', '4work', '4danger','4hope', '4water', '4explosion', '4despair', '4dawn', '4war', '4fire','4murder', '5akira_kurosawa', '6shinichiro_ikebe', '6Toru_Takemitsu']].astype(int)
+x = independent_values.values
+y = df1[[0,1,2,3]].astype(int)
+independent_values.columns
+Index(['4intro', '4freedom', '4religion', '4happy', '4work', '4danger',
+       '4hope', '4water', '4explosion', '4despair', '4dawn', '4war', '4fire',
+       '4murder', '5akira_kurosawa', '6shinichiro_ikebe', '6Toru_Takemitsu'],
+      dtype='object')
+x[0]
+array([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0])
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3)
+y_train1 = y_train[0].values
+y_test1 = y_test[0].values
+y_train2 = y_train[1].values
+y_test2 = y_test[1].values
+y_train3 = y_train[2].values
+y_test3 = y_test[2].values
+y_train4 = y_train[3].values
+y_test4 = y_test[3].values
+x_test[1]
+array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1])
+​
+import csv
+with open('new.csv', 'r') as f:
+    reader = csv.reader(f)
+    your_list = list(reader)
+z_data=[]
+for i in your_list:
+    z_data.append(i[0])
+print(z_data)
+['freedom', 'religion', 'happy', 'work', 'work', 'work', 'danger', 'danger', 'despair', 'despair', 'despair', 'religion', 'freedom', 'freedom', 'happy', 'happy', 'happy']
+1
+x_test=[]
+import copy
+#['4intro', '4freedom', '4religion', '4happy', '4work', 
+#'4danger','4hope', '4water', '4explosion', '4despair', 
+#'4dawn', '4war', '4fire','4murder', '5akira_kurosawa', 
+#'6shinichiro_ikebe', '6Toru_Takemitsu']
+t1=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0]
+for i in z_data:
+    t2 = t1.copy()
+    if (i=='intro'):
+        t2[0]=1
+        x_test.append(t2)
+        continue
+    if (i=='freedom'):
+        t2[1]=1
+        x_test.append(t2)
+        continue
+    if (i=='religion'):
+        t2[2]=1
+        x_test.append(t2)
+        continue
+    if (i=='happy'):
+        t2[3]=1
+        x_test.append(t2)
+        continue
+    if (i=='work'):
+        t2[4]=1
+        x_test.append(t2)
+        continue
+    if (i=='danger'):
+        t2[5]=1
+        x_test.append(t2)
+        continue
+    if (i=='hope'):
+        t2[6]=1
+        x_test.append(t2)
+        continue
+    if (i=='water'):
+        t2[7]=1
+        x_test.append(t2)
+        continue
+    if (i=='explosion'):
+        t2[8]=1
+        x_test.append(t2)
+        continue
+    if (i=='despair'):
+        t2[9]=1
+        x_test.append(t2)
+        continue
+    if (i=='dawn'):
+        t2[10]=1
+        x_test.append(t2)
+        continue
+    if (i=='war'):
+        t2[11]=1
+        x_test.append(t2)
+        continue
+    if (i=='fire'):
+        t2[12]=1
+        x_test.append(t2)
+        continue
+    if (i=='murder'):
+        t2[13]=1
+        x_test.append(t2)
+        continue
+print(x_test)
+[[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0]]
+model1 = tree.DecisionTreeClassifier()
+model1.fit(x_train,y_train1)
+y_pred1 = model1.predict(x_test)
+#print(metrics.accuracy_score(y_test1, y_pred1))
+​
+model2 = tree.DecisionTreeClassifier()
+model2.fit(x_train,y_train2)
+y_pred2 = model2.predict(x_test)
+#print(metrics.accuracy_score(y_test2, y_pred2))
+​
+model3 = tree.DecisionTreeClassifier()
+model3.fit(x_train,y_train3)
+y_pred3 = model3.predict(x_test)
+#print(metrics.accuracy_score(y_test3, y_pred3))
+​
+model4 = tree.DecisionTreeClassifier()
+model4.fit(x_train,y_train4)
+y_pred4 = model4.predict(x_test)
+#print(metrics.accuracy_score(y_test4, y_pred4))
+3
+#plotting results
+#C1:freedom/religion/happy/work/danger/despair
+temp=[]
+print(z_data)
+for i,j,k in zip(y_pred1,y_pred2,y_pred3):
+    temp.append([i,j,k])
+a = np.array([temp],dtype=np.uint8)
+imgplot = plt.imshow(a,aspect=3)
+['freedom', 'religion', 'happy', 'work', 'work', 'work', 'danger', 'danger', 'despair', 'despair', 'despair', 'religion', 'freedom', 'freedom', 'happy', 'happy', 'happy']
+
+​
+\t
+aud=[]
+for i in y_pred4:
+    if i>=0 and i<4:
+        aud.append('low')
+    elif i>=4 and i<15:
+        aud.append('mids')
+    elif i>=15 and i<25:
+        aud.append('high-mids')
+    elif i>=25 and i<40:
+        aud.append('high')
+    elif i>=40:
+        aud.append('very-high')
+    else:
+        aud.append('-')
+print('As it goes on\n\nTag:\tLevel\n----------------')
+for i in range(len(aud)):
+    print(z_data[i] + ':  ' + aud[i])
+    
+As it goes on
+
+Tag:	Level
+----------------
+freedom:  mids
+religion:  mids
+happy:  low
+work:  low
+work:  low
+work:  low
+danger:  high
+danger:  high
+despair:  mids
+despair:  mids
+despair:  mids
+religion:  mids
+freedom:  mids
+freedom:  mids
+happy:  low
+happy:  low
+happy:  low
+​
+​
+​
